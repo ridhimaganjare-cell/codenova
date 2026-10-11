@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CropGuard AI — Micro-Climatic Early Warning System (Live Preview)</title>
+  
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- React 18 & Babel for instant zero-install browser execution -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* ==========================================================================
+       CropGuard AI - Global Design System
+       Colors: Forest Green, Sage Green, White, Soft Cream
+       ========================================================================== */
+    :root {
+      --color-forest-dark: #143627;
+      --color-forest-primary: #1B4332;
+      --color-forest-light: #2D6A4F;
+      --color-forest-hover: #245740;
+
+      --color-sage-primary: #52B788;
+      --color-sage-light: #74C69D;
+      --color-sage-soft: #95D5B2;
+      --color-sage-bg: #E8F5E9;
+      --color-sage-tint: #F0F7F4;
+
+      --color-cream-bg: #FBFBF7;
+      --color-cream-surface: #F6F8F3;
+      --color-cream-card: #FAF9F5;
+      --color-white: #FFFFFF;
+
+      --color-text-main: #1C2D27;
+      --color-text-secondary: #4B6358;
+      --color-text-muted: #6C8276;
+      --color-border: #E0EADE;
+      --color-border-hover: #B8D8C7;
+
+      --risk-high-bg: #FEE2E2;
+      --risk-high-text: #991B1B;
+      --risk-high-border: #F87171;
+
+      --risk-mod-bg: #FEF3C7;
+      --risk-mod-text: #92400E;
+      --risk-mod-border: #FBBF24;
+
+      --risk-low-bg: #D1FAE5;
+      --risk-low-text: #065F46;
+      --risk-low-border: #34D399;
+
+      --font-family-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-family-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+      --shadow-sm: 0 2px 4px rgba(27, 67, 50, 0.04);
+      --shadow-md: 0 6px 16px rgba(27, 67, 50, 0.08);
+      --shadow-lg: 0 14px 30px rgba(27, 67, 50, 0.12);
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+
+      --max-width: 1200px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family-body);
+      background-color: var(--color-cream-bg);
+      color: var(--color-text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    h1, h2, h3, h4 {
+      font-family: var(--font-family-heading);
+      color: var(--color-forest-dark);
+      font-weight: 700;
+    }
+    button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+    img { max-width: 100%; display: block; }
+
+    .app-container { display: flex; flex-direction: column; min-height: 100vh; }
+    .main-content { flex: 1; padding-bottom: 4rem; }
+    .page-wrapper { max-width: var(--max-width); margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .card {
+      background-color: var(--color-white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+      padding: 1.75rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: var(--shadow-md); border-color: var(--color-border-hover); }
+    .card-cream { background-color: var(--color-cream-card); }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+      font-weight: 600; font-size: 0.95rem; padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-full); transition: all 0.2s;
+    }
+    .btn-primary {
+      background-color: var(--color-forest-primary); color: #FFF;
+      box-shadow: 0 4px 12px rgba(27, 67, 50, 0.2);
+    }
+    .btn-primary:hover { background-color: var(--color-forest-hover); transform: translateY(-1px); }
+    .btn-secondary {
+      background-color: var(--color-sage-tint); color: var(--color-forest-primary);
+      border: 1.5px solid var(--color-sage-soft);
+    }
+    .btn-secondary:hover { background-color: var(--color-sage-bg); }
+    .btn-outline {
+      background: transparent; color: var(--color-forest-primary);
+      border: 1.5px solid var(--color-border-hover);
+    }
+    .btn-outline:hover { background: var(--color-sage-tint); }
+    .btn-lg { padding: 0.9rem 2rem; font-size: 1.05rem; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.775rem;
+      font-weight: 600; padding: 0.3rem 0.75rem; border-radius: var(--radius-full);
+    }
+    .badge-sage { background: var(--color-sage-bg); color: var(--color-forest-primary); border: 1px solid var(--color-sage-soft); }
+    .badge-forest { background: var(--color-forest-primary); color: #FFF; }
+    .badge-demo { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 700; text-transform: uppercase; font-size: 0.7rem; }
+
+    /* Navbar */
+    .navbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(251, 251, 247, 0.96); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .navbar-container {
+      max-width: var(--max-width); margin: 0 auto; padding: 0.9rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand-link { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-icon-wrapper {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--color-forest-primary), var(--color-sage-primary));
+      display: flex; align-items: center; justify-content: center; color: #FFF;
+    }
+    .brand-title { display: flex; flex-direction: column; line-height: 1.1; }
+    .brand-name { font-family: var(--font-family-heading); font-size: 1.25rem; font-weight: 800; }
+    .brand-tag { font-size: 0.68rem; font-weight: 600; color: var(--color-sage-primary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .nav-links { display: flex; align-items: center; gap: 0.5rem; list-style: none; }
+    .nav-link {
+      font-weight: 600; font-size: 0.925rem; padding: 0.55rem 1rem;
+      border-radius: var(--radius-full); color: var(--color-text-secondary); background: transparent;
+      transition: all 0.2s;
+    }
+    .nav-link:hover { color: var(--color-forest-primary); background: var(--color-sage-tint); }
+    .nav-link.active { color: var(--color-forest-primary); background: var(--color-sage-bg); box-shadow: inset 0 0 0 1px var(--color-sage-soft); }
+
+    .mobile-menu-toggle { display: none; background: none; }
+    @media (max-width: 768px) {
+      .mobile-menu-toggle { display: block; }
+      .nav-links { display: none; }
+      .nav-links.open {
+        display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0;
+        background: var(--color-cream-bg); border-bottom: 1px solid var(--color-border);
+        padding: 1rem 1.5rem; gap: 0.5rem; box-shadow: var(--shadow-md);
+      }
+      .nav-link { width: 100%; text-align: left; }
+    }
+
+    /* Demo Banner */
+    .demo-banner {
+      background: linear-gradient(90deg, #FEF3C7 0%, #FFFBEB 100%);
+      border-bottom: 1px solid #FCD34D; padding: 0.55rem 1.5rem;
+      font-size: 0.825rem; color: #78350F; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+
+    /* Hero */
+    .hero-section {
+      padding: 3rem 0 3.5rem; display: grid; grid-template-columns: 1.15fr 0.85fr;
+      align-items: center; gap: 3rem;
+    }
+    @media (max-width: 900px) {
+      .hero-section { grid-template-columns: 1fr; gap: 2rem; padding: 1.5rem 0; }
+    }
+    .hero-title { font-size: clamp(2.2rem, 4vw + 1rem, 3.4rem); line-height: 1.15; margin-bottom: 0.75rem; }
+    .hero-tagline { font-size: 1.35rem; color: var(--color-sage-primary); margin-bottom: 1.25rem; font-weight: 700; }
+    .hero-intro { font-size: 1.05rem; color: var(--color-text-secondary); line-height: 1.7; margin-bottom: 2rem; }
+    .hero-preview-card {
+      background: linear-gradient(145deg, #FFF, var(--color-cream-card));
+      border: 1px solid var(--color-border-hover); border-radius: var(--radius-xl);
+      padding: 2rem; box-shadow: var(--shadow-lg);
+    }
+
+    /* Features Grid */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+    .feature-card { background: #FFF; border-radius: var(--radius-lg); border: 1px solid var(--color-border); padding: 1.75rem; }
+    .feature-icon-box {
+      width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--color-sage-bg);
+      color: var(--color-forest-primary); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;
+    }
+
+    /* Forms */
+    .form-group { margin-bottom: 1.6rem; }
+    .form-label { display: block; font-weight: 600; font-size: 0.95rem; margin-bottom: 0.4rem; }
+    .form-sublabel { font-size: 0.825rem; color: var(--color-text-muted); margin-bottom: 0.5rem; display: block; }
+    .form-select, .form-input {
+      width: 100%; padding: 0.85rem 1.1rem; font-size: 0.95rem;
+      border: 1.5px solid var(--color-border); border-radius: var(--radius-md); background: #FFF; outline: none;
+    }
+    .form-select:focus, .form-input:focus { border-color: var(--color-forest-light); }
+    .dropzone {
+      border: 2px dashed var(--color-sage-soft); background: var(--color-cream-card);
+      border-radius: var(--radius-lg); padding: 2.25rem 1.5rem; text-align: center; cursor: pointer;
+    }
+    .dropzone:hover { background: var(--color-sage-tint); border-color: var(--color-forest-light); }
+
+    .preview-box { border-radius: var(--radius-md); overflow: hidden; background: #000; max-height: 260px; display: flex; align-items: center; justify-content: center; }
+    .preview-box img { width: 100%; height: 240px; object-fit: cover; }
+    .preview-actions { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: #FFF; border: 1px solid var(--color-border); border-radius: 0 0 var(--radius-md) var(--radius-md); }
+
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin: 1.5rem 0; }
+    .metric-card { background: #FFF; border-radius: var(--radius-lg); border: 1px solid var(--color-border); padding: 1.35rem 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .metric-value { font-size: 1.6rem; font-weight: 800; color: var(--color-forest-dark); }
+    .metric-label { font-size: 0.825rem; color: var(--color-text-muted); }
+
+    .recommendations-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 1rem; }
+    .rec-card { background: #FFF; border-radius: var(--radius-md); border: 1px solid var(--color-border); padding: 1.35rem; display: flex; gap: 0.9rem; }
+    .rec-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--color-sage-bg); color: var(--color-forest-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    .footer { background: var(--color-forest-dark); color: #D8E2DC; padding: 3rem 1.5rem 1.5rem; margin-top: auto; border-top: 3px solid var(--color-sage-primary); }
+    .footer-container { max-width: var(--max-width); margin: 0 auto; }
+
+    .switcher-pill {
+      font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.85rem; border-radius: var(--radius-full);
+      background-color: var(--color-white); border: 1px solid var(--color-border); color: var(--color-forest-dark);
+      cursor: pointer;
+    }
+    .switcher-pill.active {
+      background-color: var(--color-forest-primary); color: #FFF; border-color: var(--color-forest-primary);
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Inlined React Application for Instant Local Testing -->
+  <script type="text/babel">
+    const { useState, useRef } = React;
+
+    // SVG Icons
+    const LeafIcon = ({ size = 20 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+      </svg>
+    );
+
+    const ShieldAlertIcon = ({ size = 20 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    );
+
+    const ThermometerIcon = ({ size = 20 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+      </svg>
+    );
+
+    const DropletsIcon = ({ size = 20 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 7 7 7s-1.14 1.06-2.29 2.06C3.57 9.99 3 11.09 3 12.25c0 2.22 1.8 4.05 4 4.05z"/>
+        <path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a7 7 0 0 1-14 0c0-1.15.26-2.24.74-3.2"/>
+      </svg>
+    );
+
+    const CloudRainIcon = ({ size = 20 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/>
+      </svg>
+    );
+
+    const CheckCircleIcon = ({ size = 20 }) => (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    );
+
+    // Mock Scenarios
+    const DEMO_LEAF = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="100%" height="100%" fill="%232D3748"/><path d="M200,30 C270,70 330,160 270,250 C230,220 200,270 200,270 C200,270 170,220 130,250 C70,160 130,70 200,30 Z" fill="%2348BB78"/><circle cx="180" cy="110" r="22" fill="%23744210" opacity="0.85"/><circle cx="230" cy="150" r="28" fill="%23744210" opacity="0.85"/><text x="200" y="285" fill="%23EDF2F7" font-size="14" font-family="sans-serif" text-anchor="middle">DEMO LEAF: Late Blight Lesions</text></svg>`;
+
+    const MOCK_RESULTS = {
+      tomato_late: {
+        id: 'tomato_late',
+        crop: "Tomato",
+        disease: "Tomato Late Blight",
+        scientific: "Phytophthora infestans",
+        confidence: 94.6,
+        risk: "High",
+        score: 88,
+        temp: "18.5°C",
+        humidity: "92% RH",
+        rain: "18.0 mm (85% prob)",
+        leafWetness: "8.5 hrs",
+        warning: "Critical High: Persistent leaf wetness with RH > 90% triggers rapid sporulation within 48 hours.",
+        recommendations: [
+          { title: "Immediate Pruning", desc: "Remove lower infected foliage and safely burn or bag away from crops." },
+          { title: "Protective Spray", desc: "Apply copper fungicide or systemic Mancozeb before the upcoming rain." },
+          { title: "Drip Irrigation", desc: "Switch strictly to root-zone drip watering to keep foliage dry." }
+        ]
+      },
+      potato_late: {
+        id: 'potato_late',
+        crop: "Potato",
+        disease: "Potato Late Blight",
+        scientific: "Phytophthora infestans",
+        confidence: 96.1,
+        risk: "High",
+        score: 92,
+        temp: "16.8°C",
+        humidity: "95% RH",
+        rain: "24.5 mm (90% prob)",
+        leafWetness: "10.0 hrs",
+        warning: "Extreme Alert: Spores will wash into soil ridges. High probability of secondary tuber rot.",
+        recommendations: [
+          { title: "Earthing Up Ridges", desc: "Build higher soil ridges to protect potato tubers from rain spore washdown." },
+          { title: "Fungicide Spray", desc: "Apply systemic Dimethomorph or Metalaxyl within 12 hours." },
+          { title: "Postpone Harvest", desc: "Avoid digging tubers during wet soil conditions to prevent post-harvest rot." }
+        ]
+      },
+      tomato_early: {
+        id: 'tomato_early',
+        crop: "Tomato",
+        disease: "Tomato Early Blight",
+        scientific: "Alternaria solani",
+        confidence: 88.4,
+        risk: "Moderate",
+        score: 58,
+        temp: "25.2°C",
+        humidity: "74% RH",
+        rain: "4.2 mm (40% prob)",
+        leafWetness: "4.5 hrs",
+        warning: "Moderate Alert: Concentric bullseye lesions detected. Warm weather with evening dew is accelerating growth.",
+        recommendations: [
+          { title: "Apply Straw Mulch", desc: "Cover soil beneath plants to prevent rain droplets from splashing fungal spores upward." },
+          { title: "Bio-Fungicide", desc: "Spray Bacillus subtilis bio-fungicide in late afternoon." },
+          { title: "Nutrient Support", desc: "Apply foliar potassium to thicken leaf cell walls." }
+        ]
+      },
+      healthy: {
+        id: 'healthy',
+        crop: "Tomato / Potato",
+        disease: "Healthy Crop Foliage",
+        scientific: "No Pathogen Detected",
+        confidence: 97.5,
+        risk: "Low",
+        score: 18,
+        temp: "22.0°C",
+        humidity: "52% RH",
+        rain: "0.0 mm (10% prob)",
+        leafWetness: "1.0 hr",
+        warning: "Foliage is vigorous and healthy. Atmospheric conditions are well within safe thresholds.",
+        recommendations: [
+          { title: "Continue Routine Drip", desc: "Maintain scheduled irrigation and organic feeding." },
+          { title: "Preventive Scouting", desc: "Re-scan leaves if local humidity spikes above 80% after rain fronts." },
+          { title: "Aeration Check", desc: "Keep weed-free spacing to preserve dry canopy airflow." }
+        ]
+      }
+    };
+
+    function App() {
+      const [page, setPage] = useState('home');
+      const [crop, setCrop] = useState('');
+      const [location, setLocation] = useState('');
+      const [imagePreview, setImagePreview] = useState(null);
+      const [errors, setErrors] = useState({});
+      const [result, setResult] = useState(MOCK_RESULTS.tomato_late);
+      const [showModal, setShowModal] = useState(false);
+
+      const fileInputRef = useRef(null);
+
+      const handleAnalyze = (e) => {
+        e.preventDefault();
+        const errs = {};
+        if (!crop) errs.crop = "Please select a target crop.";
+        if (!imagePreview) errs.image = "Please upload a leaf photograph.";
+        if (!location) errs.location = "Please enter farm location.";
+        if (Object.keys(errs).length > 0) {
+          setErrors(errs);
+          return;
+        }
+        setErrors({});
+        setResult(crop.toLowerCase() === 'potato' ? MOCK_RESULTS.potato_late : MOCK_RESULTS.tomato_late);
+        setPage('results');
+      };
+
+      return (
+        <div className="app-container">
+          <div className="demo-banner">
+            <div>
+              <span className="badge badge-demo">Simulated Demo Data</span>
+              <span>CropGuard AI Prototype: Real ML model & weather APIs can be plugged into <code>src/data/mockResults.js</code>.</span>
+            </div>
+            <button 
+              className="badge" 
+              style={{ background: '#FDE68A', color: '#78350F', border: '1px solid #FBBF24', cursor: 'pointer' }}
+              onClick={() => setShowModal(true)}
+            >
+              Integration Guide
+            </button>
+          </div>
+
+          <header className="navbar">
+            <div className="navbar-container">
+              <div className="brand-link" onClick={() => setPage('home')} style={{ cursor: 'pointer' }}>
+                <div className="brand-icon-wrapper"><LeafIcon size={22}/></div>
+                <div className="brand-title">
+                  <span className="brand-name">CropGuard AI</span>
+                  <span className="brand-tag">Early Warning</span>
+                </div>
+              </div>
+
+              <ul className="nav-links">
+                <li><button className={`nav-link ${page==='home'?'active':''}`} onClick={() => setPage('home')}>Home</button></li>
+                <li><button className={`nav-link ${page==='analysis'?'active':''}`} onClick={() => setPage('analysis')}>Crop Analysis</button></li>
+                <li><button className={`nav-link ${page==='results'?'active':''}`} onClick={() => setPage('results')}>Results Dashboard</button></li>
+                <li><button className={`nav-link ${page==='about'?'active':''}`} onClick={() => setPage('about')}>About</button></li>
+                <li><button className="btn btn-primary" onClick={() => setPage('analysis')}>Analyze Crop</button></li>
+              </ul>
+            </div>
+          </header>
+
+          <main className="main-content">
+            {page === 'home' && (
+              <div className="page-wrapper">
+                <section className="hero-section">
+                  <div>
+                    <span className="badge badge-sage" style={{ marginBottom: '1rem' }}>🌱 Micro-Climatic AgroTech</span>
+                    <h1 className="hero-title">CropGuard AI</h1>
+                    <div className="hero-tagline">Predict Before It Spreads</div>
+                    <p className="hero-intro">
+                      Micro-Climatic Crop Disease Early Warning System. By combining visual leaf inspection with canopy temperature, humidity, and rainfall forecasts, CropGuard AI alerts farmers days before devastating spore transmission takes hold.
+                    </p>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <button className="btn btn-primary btn-lg" onClick={() => setPage('analysis')}>Start Analysis</button>
+                      <button className="btn btn-secondary btn-lg" onClick={() => setPage('about')}>How It Works</button>
+                    </div>
+                  </div>
+
+                  <div className="hero-preview-card">
+                    <h3 style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>Early Warning Preview</span>
+                      <span className="badge" style={{ background: '#FEE2E2', color: '#991B1B' }}>High Risk (88/100)</span>
+                    </h3>
+                    <div className="preview-box" style={{ marginBottom: '1rem' }}>
+                      <img src={DEMO_LEAF} alt="Preview" />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                      <div className="card" style={{ padding: '0.75rem' }}>
+                        <span style={{ fontSize: '0.75rem', color: '#666' }}>Humidity</span>
+                        <div style={{ fontWeight: 800, color: '#991B1B' }}>92% RH</div>
+                      </div>
+                      <div className="card" style={{ padding: '0.75rem' }}>
+                        <span style={{ fontSize: '0.75rem', color: '#666' }}>Canopy Temp</span>
+                        <div style={{ fontWeight: 800 }}>18.5°C</div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            )}
+
+            {page === 'analysis' && (
+              <div className="page-wrapper">
+                <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Crop Diagnostic Analysis</h1>
+                <p style={{ color: 'var(--color-text-secondary)', marginBottom: '2rem' }}>Upload your leaf photo, select crop and farm location to generate micro-climatic warnings.</p>
+
+                <div className="card" style={{ maxWidth: '680px', margin: '0 auto' }}>
+                  <form onSubmit={handleAnalyze}>
+                    {Object.keys(errors).length > 0 && (
+                      <div style={{ background: '#FEE2E2', color: '#991B1B', padding: '0.75rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                        Please complete all required fields.
+                      </div>
+                    )}
+
+                    <div className="form-group">
+                      <label className="form-label">1. Select Crop *</label>
+                      <select className="form-select" value={crop} onChange={(e) => setCrop(e.target.value)}>
+                        <option value="">-- Choose Crop --</option>
+                        <option value="Tomato">🍅 Tomato (Solanum lycopersicum)</option>
+                        <option value="Potato">🥔 Potato (Solanum tuberosum)</option>
+                      </select>
+                      {errors.crop && <span style={{ color: '#DC2626', fontSize: '0.8rem' }}>{errors.crop}</span>}
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">2. Upload Leaf Photo *</label>
+                      <input 
+                        type="file" 
+                        ref={fileInputRef} 
+                        style={{ display: 'none' }} 
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (ev) => setImagePreview(ev.target.result);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+
+                      {!imagePreview ? (
+                        <div className="dropzone" onClick={() => fileInputRef.current?.click()}>
+                          <LeafIcon size={32} />
+                          <div style={{ fontWeight: 700, margin: '0.5rem 0' }}>Click to select leaf photo</div>
+                          <span style={{ fontSize: '0.8rem', color: '#777' }}>PNG, JPG, WebP</span>
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="preview-box">
+                            <img src={imagePreview} alt="Leaf Preview" />
+                          </div>
+                          <div className="preview-actions">
+                            <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Leaf Photo Loaded</span>
+                            <button type="button" className="btn btn-outline" style={{ padding: '0.25rem 0.6rem' }} onClick={() => setImagePreview(null)}>Remove</button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: '#F4F6F0', borderRadius: '8px' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>Or test with a sample:</span>
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
+                          <button type="button" className="btn btn-outline" style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }} onClick={() => { setImagePreview(DEMO_LEAF); setCrop('Tomato'); setLocation('Nashik Valley, MH'); }}>Sample Tomato</button>
+                          <button type="button" className="btn btn-outline" style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }} onClick={() => { setImagePreview(DEMO_LEAF); setCrop('Potato'); setLocation('Punjab North Farm'); }}>Sample Potato</button>
+                        </div>
+                      </div>
+                      {errors.image && <span style={{ color: '#DC2626', fontSize: '0.8rem' }}>{errors.image}</span>}
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">3. Location *</label>
+                      <input 
+                        type="text" 
+                        className="form-input" 
+                        placeholder="e.g. Nashik Valley, Maharashtra" 
+                        value={location} 
+                        onChange={(e) => setLocation(e.target.value)} 
+                      />
+                      {errors.location && <span style={{ color: '#DC2626', fontSize: '0.8rem' }}>{errors.location}</span>}
+                    </div>
+
+                    <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
+                      Analyse Crop
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+
+            {page === 'results' && (
+              <div className="page-wrapper">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div>
+                    <span className="badge badge-demo">Simulated Demo Data</span>
+                    <h1 style={{ fontSize: '2rem', marginTop: '0.5rem' }}>Results Dashboard</h1>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button className="btn btn-outline" onClick={() => window.print()}>Print / Save PDF</button>
+                    <button className="btn btn-secondary" onClick={() => setPage('analysis')}>Analyze Another Crop</button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+                  <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                    <div className="preview-box">
+                      <img src={imagePreview || DEMO_LEAF} alt="Analyzed Crop" />
+                    </div>
+                    <div style={{ padding: '1rem', fontSize: '0.85rem' }}>
+                      <div><strong>Crop:</strong> {result.crop || crop || 'Tomato'}</div>
+                      <div><strong>Location:</strong> {location || 'Nashik Valley, MH'}</div>
+                    </div>
+                  </div>
+
+                  <div className="card">
+                    <span style={{ fontSize: '0.8rem', color: '#777', textTransform: 'uppercase' }}>Identified Disease</span>
+                    <h2 style={{ fontSize: '1.8rem', margin: '0.25rem 0' }}>{result.disease}</h2>
+                    <div style={{ fontStyle: 'italic', color: '#666', marginBottom: '1rem' }}>{result.scientific}</div>
+
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
+                      <span className="badge" style={{ 
+                        background: result.risk === 'High' ? '#FEE2E2' : result.risk === 'Moderate' ? '#FEF3C7' : '#D1FAE5', 
+                        color: result.risk === 'High' ? '#991B1B' : result.risk === 'Moderate' ? '#92400E' : '#065F46', 
+                        padding: '0.4rem 0.8rem', 
+                        fontSize: '0.85rem' 
+                      }}>
+                        {result.risk} Risk ({result.score}/100)
+                      </span>
+                      <span>Confidence: <strong>{result.confidence}%</strong></span>
+                    </div>
+
+                    <div style={{ 
+                      background: result.risk === 'High' ? '#FEE2E2' : result.risk === 'Moderate' ? '#FEF3C7' : '#D1FAE5', 
+                      color: result.risk === 'High' ? '#991B1B' : result.risk === 'Moderate' ? '#92400E' : '#065F46', 
+                      padding: '0.75rem 1rem', 
+                      borderRadius: '8px', 
+                      fontSize: '0.875rem' 
+                    }}>
+                      <strong>Early Warning:</strong> {result.warning}
+                    </div>
+                  </div>
+                </div>
+
+                <h3 style={{ marginBottom: '1rem' }}>Micro-Climatic Indicators</h3>
+                <div className="metrics-grid">
+                  <div className="metric-card">
+                    <span className="metric-label">Temperature</span>
+                    <div className="metric-value">{result.temp}</div>
+                    <span style={{ fontSize: '0.75rem', color: result.risk === 'High' ? '#991B1B' : '#065F46' }}>Optimal Range Check</span>
+                  </div>
+                  <div className="metric-card">
+                    <span className="metric-label">Relative Humidity</span>
+                    <div className="metric-value">{result.humidity}</div>
+                    <span style={{ fontSize: '0.75rem', color: result.risk === 'High' ? '#991B1B' : '#065F46' }}>Moisture Threshold</span>
+                  </div>
+                  <div className="metric-card">
+                    <span className="metric-label">Rainfall Forecast</span>
+                    <div className="metric-value">{result.rain}</div>
+                    <span style={{ fontSize: '0.75rem', color: '#666' }}>Spore Washdown Risk</span>
+                  </div>
+                  <div className="metric-card">
+                    <span className="metric-label">Leaf Wetness</span>
+                    <div className="metric-value">{result.leafWetness}</div>
+                    <span style={{ fontSize: '0.75rem', color: result.risk === 'High' ? '#991B1B' : '#065F46' }}>Smith Period Window</span>
+                  </div>
+                </div>
+
+                <h3 style={{ margin: '2rem 0 1rem' }}>Preventive Recommendations</h3>
+                <div className="recommendations-grid">
+                  {result.recommendations.map((rec, i) => (
+                    <div key={i} className="rec-card">
+                      <div className="rec-icon"><CheckCircleIcon size={20}/></div>
+                      <div>
+                        <h4 style={{ fontSize: '0.95rem' }}>{rec.title}</h4>
+                        <p style={{ fontSize: '0.85rem', color: '#555' }}>{rec.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Scenario Switcher for Judges */}
+                <div style={{ marginTop: '2.5rem', padding: '1.25rem', background: '#FAF9F5', border: '1.5px dashed #B8D8C7', borderRadius: '14px' }}>
+                  <div style={{ fontWeight: 700, marginBottom: '0.5rem', color: 'var(--color-forest-dark)' }}>
+                    🧪 Hackathon Judge Demo Switcher:
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button className={`switcher-pill ${result.id==='tomato_late'?'active':''}`} onClick={() => setResult(MOCK_RESULTS.tomato_late)}>🍅 Tomato Late Blight (High)</button>
+                    <button className={`switcher-pill ${result.id==='potato_late'?'active':''}`} onClick={() => setResult(MOCK_RESULTS.potato_late)}>🥔 Potato Late Blight (High)</button>
+                    <button className={`switcher-pill ${result.id==='tomato_early'?'active':''}`} onClick={() => setResult(MOCK_RESULTS.tomato_early)}>🍅 Tomato Early Blight (Moderate)</button>
+                    <button className={`switcher-pill ${result.id==='healthy'?'active':''}`} onClick={() => setResult(MOCK_RESULTS.healthy)}>🌿 Healthy Foliage (Low)</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {page === 'about' && (
+              <div className="page-wrapper">
+                <h1 style={{ fontSize: '2.2rem', marginBottom: '0.5rem', textAlign: 'center' }}>How CropGuard AI Works</h1>
+                <p style={{ textAlign: 'center', color: '#666', maxWidth: '640px', margin: '0 auto 2.5rem' }}>
+                  Micro-Climatic Crop Disease Early Warning System for first-year engineering hackathon.
+                </p>
+
+                <div className="features-grid">
+                  <div className="feature-card">
+                    <div className="feature-icon-box"><LeafIcon size={24}/></div>
+                    <h3>1. Visual Foliar Detection</h3>
+                    <p>Computer vision scans mobile leaf photos for early concentric lesions and water-soaked spots before spreading across the field.</p>
+                  </div>
+                  <div className="feature-card">
+                    <div className="feature-icon-box"><ThermometerIcon size={24}/></div>
+                    <h3>2. Micro-Climate Fusion</h3>
+                    <p>Fungal pathogens strictly require temperatures between 15-22°C and humidity &gt;85% for 6+ hours ("Smith Period"). We track this to forecast outbreaks.</p>
+                  </div>
+                  <div className="feature-card">
+                    <div className="feature-icon-box"><ShieldAlertIcon size={24}/></div>
+                    <h3>3. Actionable Advisory</h3>
+                    <p>Farmers receive preventive fungicide sprays, irrigation cuts, and airflow advice before rainstorms wash spores into soil tubers.</p>
+                  </div>
+                </div>
+
+                <div className="card" style={{ maxWidth: '600px', margin: '2rem auto', textAlign: 'center' }}>
+                  <span className="badge badge-sage">Team CodeNova</span>
+                  <h3 style={{ margin: '0.75rem 0' }}>Built for 6-Hour Hackathon</h3>
+                  <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '1.25rem' }}>
+                    Micro-Climatic Crop Disease Early Warning System frontend built with React, Vite, and modern agricultural design.
+                  </p>
+                  <button className="btn btn-primary" onClick={() => setPage('analysis')}>Test Analysis</button>
+                </div>
+              </div>
+            )}
+          </main>
+
+          <footer className="footer">
+            <div className="footer-container">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <h4 style={{ color: '#FFF' }}>CropGuard AI</h4>
+                  <p style={{ fontSize: '0.85rem', color: '#B7C8B5' }}>Predict Before It Spreads • Team CodeNova</p>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#8DA396' }}>
+                  Frontend Prototype • DEMO DATA
+                </div>
+              </div>
+            </div>
+          </footer>
+
+          {showModal && (
+            <div style={{ position: 'fixed', inset: 0, background: 'rgba(20,54,39,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }} onClick={() => setShowModal(false)}>
+              <div className="card" style={{ maxWidth: '560px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
+                <h3 style={{ marginBottom: '1rem' }}>🛠️ Teammate Backend Integration</h3>
+                <p style={{ fontSize: '0.9rem', color: '#4B6358' }}>
+                  All mock scenarios are located in <code>src/data/mockResults.js</code>. When your backend teammate runs their FastAPI / Flask model, simply replace the mock simulator with:
+                </p>
+                <pre style={{ background: '#1E293B', color: '#E2E8F0', padding: '0.85rem', borderRadius: '8px', fontSize: '0.8rem', marginTop: '0.5rem', overflowX: 'auto' }}>
+{`const res = await fetch('http://localhost:8000/api/predict', {
+  method: 'POST',
+  body: formData
+});
+return await res.json();`}
+                </pre>
+                <button className="btn btn-primary" style={{ marginTop: '1rem' }} onClick={() => setShowModal(false)}>Close</button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
