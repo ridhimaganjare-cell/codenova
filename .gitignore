@@ -32,4 +32,5 @@ Thumbs.db
 
 # Local verification & nested clone
 test_verify.py
+push_to_github.bat
 codenova/
